@@ -17,7 +17,7 @@
 - (void)topAlignFrameWithSectionInset:(UIEdgeInsets)sectionInset
 {
     CGRect frame = self.frame;
-    frame.origin.y = sectionInset.top;
+    frame.origin.y += sectionInset.top;
     self.frame = frame;
 }
 
@@ -61,7 +61,6 @@
     NSIndexPath* previousIndexPath = [NSIndexPath indexPathForItem:indexPath.item-1 inSection:indexPath.section];
     CGRect previousFrame = [self layoutAttributesForItemAtIndexPath:previousIndexPath].frame;
 
-    CGFloat previousFrameRightPoint = previousFrame.origin.x + previousFrame.size.width;
     CGRect currentFrame = currentItemAttributes.frame;
     CGRect strecthedCurrentFrame = CGRectMake(sectionInset.left,
                                               currentFrame.origin.y,
@@ -85,9 +84,10 @@
         }
         
         _lastFirstItemInRow=indexPath.item;
-        
+        CGFloat tmpMinimumLineSpacing=[self evaluatedMinimumLineSpacingForItemAtIndex:indexPath.row];
+
         CGRect frame = currentItemAttributes.frame;
-        frame.origin.y = previousY;
+        frame.origin.y = previousY+tmpMinimumLineSpacing;
         currentItemAttributes.frame = frame;
 
         // make sure the first item on a line is left aligned
@@ -95,24 +95,23 @@
     }
     
     CGRect frame = currentItemAttributes.frame;
-    CGFloat tmpMinimumInteritemSpacing=[self evaluatedMinimumInteritemSpacingForItemAtIndex:indexPath.row];
-    frame.origin.x = previousFrameRightPoint + tmpMinimumInteritemSpacing;
+
     frame.origin.y = previousFrame.origin.y;
     currentItemAttributes.frame = frame;
     return currentItemAttributes;
 }
 
-
-- (CGFloat)evaluatedMinimumInteritemSpacingForItemAtIndex:(NSInteger)index
+- (CGFloat)evaluatedMinimumLineSpacingForItemAtIndex:(NSInteger)index
 {
-    if ([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)]) {
+    if ([self.collectionView.delegate respondsToSelector:@selector(collectionView:layout:minimumLineSpacingForSectionAtIndex:)]) {
         id<UICollectionViewDelegateTopAlignedLayout> delegate = (id<UICollectionViewDelegateTopAlignedLayout>)self.collectionView.delegate;
         
-        return [delegate collectionView:self.collectionView layout:self minimumInteritemSpacingForSectionAtIndex:index];
+        return [delegate collectionView:self.collectionView layout:self minimumLineSpacingForSectionAtIndex:index];
     } else {
-        return self.minimumInteritemSpacing;
+        return self.minimumLineSpacing;
     }
 }
+
 
 - (UIEdgeInsets)evaluatedSectionInsetForItemAtIndex:(NSInteger)index
 {
