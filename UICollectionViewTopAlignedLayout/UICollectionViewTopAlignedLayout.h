@@ -11,7 +11,3 @@
 @interface UICollectionViewTopAlignedLayout : UICollectionViewFlowLayout
 
 @end
-
-@protocol UICollectionViewDelegateTopAlignedLayout <UICollectionViewDelegateFlowLayout>
-
-@end
